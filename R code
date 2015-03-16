@@ -1,0 +1,73 @@
+## Function for opening LICOR files in a folder and calculating the slope
+
+## Inputs required are the folder name with the LICOR files (this should not have any other files),
+## the sample rate (secs, default = 1 sec), length of noisy period (mins, default = 1 min),
+## and the length of the sample period (mins, default = 5 mins)
+
+## Outputs the sample name (file name), date time (in date time format), slope (k), r^2 value, mean_temp, and mean_pressure
+
+
+LICOR <- function(folder=folder, sample_rate=1, noisy_period=1, sample_period=5){
+
+  file.list <- list.files(folder) #list the folder to be unpacked
+  LICOR_data <- matrix(ncol=6,nrow=length(list.files))
+  LICOR_data <- data.frame(LICOR_data)
+
+  for(i in 1:length(file.list)){
+    ##regular expressions to extract information from file name
+    LICOR_data[i,1] <- unlist(strsplit(file.list[i],"[.txt]"))[1]
+    d <- substring(readLines(paste(folder,file.list[i],sep='/'),1),2,10)
+    ##Load data discarding noisy data 
+    data <- read.table(paste(folder,file.list[i],sep='/'),header=T,sep=' ',skip=1)[((60*noisy_period)+1):((60*noisy_period)+(60*sample_period)),]
+    t <- as.character(data[dim(data)[1]/2,1])
+    LICOR_data[i,2] <- paste(d, t)
+    temp <- lm(data[,2]~c(1:dim(data)[1]))
+    LICOR_data[i,3] <- (coefficients(temp)[2])/sample_rate
+    LICOR_data[i,4] <- summary(temp)$adj.r.squared
+    LICOR_data[i,5] <- mean(data[,3],na.rm=TRUE)
+    LICOR_data[i,6] <- mean(data[,4],na.rm=TRUE)
+  }
+  LICOR_data[[2]] <- as.POSIXlt(LICOR_data[,c(2)], format="%Y-%m-%e %H:%M:%S")
+  names(LICOR_data) <- c('sample', 'date_time', 'k', 'adj.r.squared', 'CellTemp.c', 'CellPres.kPa')
+  return(LICOR_data)
+}
+
+## For getting the respiration rate (in µg CO2 g^-1 (dry mass of WD) s^-1) from equation using the gas constant R (equation#7)
+#inputs required
+#deltaCO2 = k from above
+#P (pressure) = CellPress.kPa from above
+#Tc = chamber temperature in degrees C (use ambient temperature, if chamber temp not available). Note this is NOT CellTemp.c.
+#Vc = chamber volume, including tubing, in m^3.
+#Vs = wood sample volume in m^3
+#Ws = dry mass of wood sample in g
+respiration_rate1<-function(deltaCO2,P,Tc,Vc,Vs,Ws){ 
+    MCO2<-44.01# molar mass of CO2
+    Ti<-273.15# absolute temperature in Kelvin
+    R<-8.314# unviversal gas constant
+    
+  deltaCO2*MCO2*P*(Vc-Vs)*((R*(Ti+Tc))^-1)*Ws^-1
+  }
+
+##Example #not run#
+#respiration_rate1(deltaCO2=1.38,P=83.02,Tc=25.87,Vc=11.84,Vs=3.84,Ws=2559.84)
+
+
+## For getting the respiration rate (in µg CO2 g^-1 (dry mass of WD) s^-1) from equation 
+## not using the gas constant R but its equivalent (equation#9)
+#deltaCO2 = k from above
+#P (pressure) = CellPress.kPa from above
+#Tc = chamber temperature in degrees C (use ambient temperature, if chamber temp not available). Note this is NOT CellTemp.c.
+#Vc = chamber volume, including tubing, in m^3.
+#Vs = wood sample volume in m^3
+#Ws = dry weight of wood sample in g
+respiration_rate2<-function(deltaCO2,P,Tc,Vc,Vs,Ws){ 
+  MCO2<-44.01# molar mass of CO2 
+  Ti<-273.15# absolute temperature in Kelvin
+  Pi<-101.325# atmospheric pressure at standard conditions
+  Vi<-22.41# air molar volume at standard conditions
+  
+  deltaCO2*MCO2*P*(Pi^-1)*(Vc-Vs)*(Vi^-1)*Ti*((Ti+Tc)^-1)*Ws^-1
+}
+
+##Example #not run#
+#respiration_rate2 (deltaCO2=1.38,P=83.02,Tc=25.87,Vc=11.84,Vs=3.84,Ws=2559.84)
