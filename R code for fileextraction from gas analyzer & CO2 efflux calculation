@@ -32,7 +32,8 @@ LICOR <- function(folder=folder, sample_rate=1, noisy_period=1, sample_period=5)
   return(LICOR_data)
 }
 
-## For getting the respiration rate (in µg CO2 g^-1 (dry mass of WD) s^-1) from equation using the gas constant R (equation#7)
+## For getting the respiration rate (in µg CO2 g^-1 (dry mass of WD) s^-1) from equation using the gas constant R 
+#(equation#7 of the main text, note that we multiply by MCO2 in order to get the rate in µg CO2 g^-1 (dry mass of WD) s^-1))
 #inputs required
 #deltaCO2 = k from above
 #P (pressure) = CellPress.kPa from above
@@ -53,7 +54,8 @@ respiration_rate1<-function(deltaCO2,P,Tc,Vc,Vs,Ws){
 
 
 ## For getting the respiration rate (in µg CO2 g^-1 (dry mass of WD) s^-1) from equation 
-## not using the gas constant R but its equivalent (equation#9)
+## not using the gas constant R but its equivalent 
+#(equation#9 of the main text, note that we multiply by MCO2 in order to get the rate in µg CO2 g^-1 (dry mass of WD) s^-1))
 #deltaCO2 = k from above
 #P (pressure) = CellPress.kPa from above
 #Tc = chamber temperature in degrees C (use ambient temperature, if chamber temp not available). Note this is NOT CellTemp.c.
