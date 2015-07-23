@@ -16,7 +16,7 @@ LICOR <- function(folder=folder, sample_rate=1, noisy_period=1, sample_period=5)
   for(i in 1:length(file.list)){
     ##regular expressions to extract information from file name
     LICOR_data[i,1] <- unlist(strsplit(file.list[i],"[.txt]"))[1]
-    d <- substring(readLines(paste(folder,file.list[i],sep='/'),1),2,10)
+    d <- substring(readLines(paste(folder,file.list[i],sep='/'),1),2,11)
     ##Load data discarding noisy data 
     data <- read.table(paste(folder,file.list[i],sep='/'),header=T,sep=' ',skip=1)[((60*noisy_period)+1):((60*noisy_period)+(60*sample_period)),]
     t <- as.character(data[dim(data)[1]/2,1])
