@@ -1,5 +1,9 @@
-## Function for opening LICOR files in a folder and calculating the slope
 
+
+## Function for opening LICOR files in a folder and calculating the slope
+## When used, please give credit to authors by citing: Dossa, G. G. O., Paudel, E., Wang, H., Cao, K., Schaefer, D. and Harrison, R. D. (2015), 
+                                                    ## Correct calculation of CO2 efflux using a closed-chamber linked to a non-dispersive infrared 
+                                                    ## gas analyzer. Methods Ecol Evol, 6: 1435–1442. doi:10.1111/2041-210X.12451
 ## Inputs required are the folder name with the LICOR files (this should not have any other files),
 ## the sample rate (secs, default = 1 sec), length of noisy period (mins, default = 1 min),
 ## and the length of the sample period (mins, default = 5 mins)
